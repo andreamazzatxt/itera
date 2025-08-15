@@ -3,7 +3,7 @@
 import { MapViewState, useMap } from "@/contexts/map-context";
 import { getPositionsAtTime } from "@/lib/gps-utils";
 import { hexToRgbTuple } from "@/lib/utils";
-import { PathLayer, ScatterplotLayer } from "@deck.gl/layers";
+import { IconLayer, PathLayer, ScatterplotLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { useMemo } from "react";
 import { Map } from "react-map-gl/maplibre";
@@ -38,17 +38,32 @@ export default function MainMap() {
       .filter((p) => p.coordinates)
       .map((p) => ({
         position: [p.coordinates![0], p.coordinates![1]],
+        color: hexToRgbTuple(
+          tracks.find((t) => t.id === p.trackId)?.color || "#0000ff"
+        ) || [0, 0, 255],
       }));
 
-    return new ScatterplotLayer({
+    return new IconLayer({
       id: "markers",
       data: points,
+      pickable: true,
+      iconAtlas: "/icons/marker-atlas.png",
+      iconMapping: {
+        marker: {
+          x: 0,
+          y: 0,
+          width: 128,
+          height: 128,
+          anchorY: 128,
+          mask: true,
+        },
+      },
+      getIcon: () => "marker",
       getPosition: (d) => d.position,
-      getFillColor: [0, 0, 255],
-      getRadius: 8,
-      radiusMinPixels: 8,
+      getSize: 40,
+      getColor: (d) => d.color,
     });
-  }, [positionsByTime]);
+  }, [positionsByTime, tracks]);
 
   return (
     <DeckGL
@@ -57,7 +72,7 @@ export default function MainMap() {
         setViewState(viewState as MapViewState)
       }
       controller={true}
-      layers={[...trackLayers, markerLayer]}
+      layers={[markerLayer, ...trackLayers]}
     >
       <Map
         mapLib={import("maplibre-gl")}
