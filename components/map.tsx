@@ -3,7 +3,7 @@
 import { MapViewState, useMap } from "@/contexts/map-context";
 import { getPositionsAtTime } from "@/lib/gps-utils";
 import { hexToRgbTuple } from "@/lib/utils";
-import { IconLayer, PathLayer, ScatterplotLayer } from "@deck.gl/layers";
+import { IconLayer, PathLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { useMemo } from "react";
 import { Map } from "react-map-gl/maplibre";

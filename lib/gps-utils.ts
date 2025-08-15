@@ -1,3 +1,4 @@
+import { MapViewState } from "@deck.gl/core";
 import toGeoJSON from "@mapbox/togeojson";
 
 export interface GeoJSONFeature {
@@ -215,4 +216,95 @@ export function getAllTrackCoordinates(
     }
   });
   return allCoords;
+}
+
+export function getBounds(positions: [number, number][]) {
+  if (positions.length === 0) return null;
+
+  let minX = positions[0][0];
+  let minY = positions[0][1];
+  let maxX = positions[0][0];
+  let maxY = positions[0][1];
+
+  positions.forEach(([lon, lat]) => {
+    if (lon < minX) minX = lon;
+    if (lon > maxX) maxX = lon;
+    if (lat < minY) minY = lat;
+    if (lat > maxY) maxY = lat;
+  });
+
+  return [
+    [minX, minY], // SW
+    [maxX, maxY], // NE
+  ] as [[number, number], [number, number]];
+}
+
+export function getZoomForBounds(
+  sw: [number, number],
+  ne: [number, number],
+  padding: number
+) {
+  const WORLD_DIM = { width: 256, height: 256 };
+  const ZOOM_MAX = 24;
+
+  function latRad(lat: number) {
+    const sin = Math.sin((lat * Math.PI) / 180);
+    const radX2 = Math.log((1 + sin) / (1 - sin)) / 2;
+    return Math.max(Math.min(radX2, Math.PI), -Math.PI) / 2;
+  }
+
+  function zoom(mapPx: number, worldPx: number, fraction: number) {
+    return Math.floor(Math.log(mapPx / worldPx / fraction) / Math.LN2);
+  }
+
+  const latFraction = (latRad(ne[1]) - latRad(sw[1])) / Math.PI;
+  const lonDiff = ne[0] - sw[0];
+  const lonFraction = (lonDiff < 0 ? lonDiff + 360 : lonDiff) / 360;
+
+  const latZoom = zoom(
+    window.innerHeight - padding * 2,
+    WORLD_DIM.height,
+    latFraction
+  );
+  const lonZoom = zoom(
+    window.innerWidth - padding * 2,
+    WORLD_DIM.width,
+    lonFraction
+  );
+
+  return Math.min(latZoom, lonZoom, ZOOM_MAX);
+}
+
+export function getViewBounds(viewState: MapViewState) {
+  const { latitude, longitude, zoom } = viewState;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  const scale = 512 * Math.pow(2, zoom);
+  const degPerPixelX = 360 / scale;
+  const degPerPixelY = 360 / scale;
+
+  const lonDelta = (width / 2) * degPerPixelX;
+  const latDelta = (height / 2) * degPerPixelY;
+
+  return {
+    west: longitude - lonDelta,
+    east: longitude + lonDelta,
+    south: latitude - latDelta,
+    north: latitude + latDelta,
+  };
+}
+
+export function markersOutsideView(
+  positions: [number, number][],
+  viewBounds: { west: number; east: number; south: number; north: number }
+) {
+  return positions.some(([lon, lat]) => {
+    return (
+      lon < viewBounds.west ||
+      lon > viewBounds.east ||
+      lat < viewBounds.south ||
+      lat > viewBounds.north
+    );
+  });
 }
