@@ -1,3 +1,4 @@
+import { MapViewState } from "@deck.gl/core";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -26,4 +27,19 @@ export function hexToRgbTuple(hex: string): [number, number, number] {
   const b = num & 255;
 
   return [r, g, b];
+}
+
+export function isMapViewState(vs: unknown): vs is MapViewState {
+  if (!vs || typeof vs !== "object") return false;
+
+  if ("longitude" in vs && "latitude" in vs) {
+    return (
+      vs &&
+      typeof vs === "object" &&
+      typeof vs.longitude === "number" &&
+      typeof vs.latitude === "number"
+    );
+  }
+
+  return false;
 }

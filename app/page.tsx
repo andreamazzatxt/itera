@@ -8,7 +8,7 @@ import { TimeControlPanel } from "@/features/track-time-panel";
 import { MapContextProvider } from "@/contexts/map-context";
 import { Zoom } from "@/features/zoom";
 
-const Map = dynamic(() => import("../components/map"), {
+const Map = dynamic(() => import("../features/map/map"), {
   ssr: false,
   loading: () => (
     <div className="w-full h-screen flex items-center justify-center bg-black"></div>

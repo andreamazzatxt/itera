@@ -1,16 +1,22 @@
 "use client";
 
-import { MapViewState, useMap } from "@/contexts/map-context";
+import { useMap } from "@/contexts/map-context";
 import { getPositionsAtTime } from "@/lib/gps-utils";
-import { hexToRgbTuple } from "@/lib/utils";
+import { hexToRgbTuple, isMapViewState } from "@/lib/utils";
 import { IconLayer, PathLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { useMemo } from "react";
 import { Map } from "react-map-gl/maplibre";
+import { useFlyOver } from "./use-fly-over";
 
 export default function MainMap() {
   const { tracks, time, viewState, setViewState } = useMap();
   const positionsByTime = getPositionsAtTime(tracks, time);
+
+  const { stop } = useFlyOver({
+    active: tracks.length === 0,
+    setViewState,
+  });
 
   const trackLayers = useMemo(() => {
     return tracks.map(
@@ -68,9 +74,11 @@ export default function MainMap() {
   return (
     <DeckGL
       viewState={{ ...viewState }}
-      onViewStateChange={({ viewState }) =>
-        setViewState(viewState as MapViewState)
-      }
+      onViewStateChange={({ viewState }) => {
+        if (isMapViewState(viewState)) {
+          setViewState(viewState);
+        }
+      }}
       controller={true}
       layers={[markerLayer, ...trackLayers]}
     >

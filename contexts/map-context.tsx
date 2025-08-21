@@ -3,11 +3,9 @@ import {
   getAllTrackCoordinates,
   TrackData,
 } from "@/lib/gps-utils";
-import { FlyToInterpolator } from "@deck.gl/core";
-import DeckGL from "@deck.gl/react";
+import { FlyToInterpolator, MapViewState } from "@deck.gl/core";
 import { useGeolocation, useLocalStorage } from "@uidotdev/usehooks";
 import {
-  ComponentProps,
   createContext,
   Dispatch,
   SetStateAction,
@@ -19,8 +17,6 @@ import {
 
 const mapCenter = [12.4964, 41.9028];
 const mapZoom = 15;
-
-export type MapViewState = ComponentProps<typeof DeckGL>["viewState"];
 
 const MapContext = createContext<{
   tracks: TrackData[];
