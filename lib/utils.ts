@@ -11,7 +11,10 @@ export function formatTimestamp(ts: number): string {
   return d.toLocaleString();
 }
 
-export function hexToRgbTuple(hex: string): [number, number, number] {
+export function hexToRgbTuple(
+  hex: string,
+  alpha = 255
+): [number, number, number, number] {
   hex = hex.replace(/^#/, "");
 
   if (hex.length === 3) {
@@ -26,7 +29,7 @@ export function hexToRgbTuple(hex: string): [number, number, number] {
   const g = (num >> 8) & 255;
   const b = num & 255;
 
-  return [r, g, b];
+  return [r, g, b, alpha];
 }
 
 export function isMapViewState(vs: unknown): vs is MapViewState {

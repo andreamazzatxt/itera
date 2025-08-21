@@ -10,8 +10,9 @@ export interface GeoJSONFeature {
   properties: {
     name?: string;
     description?: string;
+    coordTimes?: string[];
     time?: string;
-    [key: string]: string | number | undefined;
+    [key: string]: string | number | string[] | undefined;
   };
 }
 

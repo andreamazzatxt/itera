@@ -9,35 +9,39 @@ import { useMemo } from "react";
 import { Map } from "react-map-gl/maplibre";
 import { useFlyOver } from "./use-fly-over";
 
+const maxZoom = 18;
+
 export default function MainMap() {
   const { tracks, time, viewState, setViewState } = useMap();
   const positionsByTime = getPositionsAtTime(tracks, time);
 
-  const { stop } = useFlyOver({
+  useFlyOver({
     active: tracks.length === 0,
     setViewState,
   });
 
-  const trackLayers = useMemo(() => {
-    return tracks.map(
-      (track) =>
-        new PathLayer({
-          id: `track-${track.id}`,
-          data: track.geojson.features.map((f) =>
-            f.geometry.coordinates.map((coord) => {
-              const c = coord as [number, number];
-              return [c[0], c[1]];
-            })
-          ),
-          getPath: (d) => d,
-          getColor: hexToRgbTuple(track.color) || [255, 0, 0],
-          widthMinPixels: 4,
-          extruded: true,
-          getElevation: (d: [number, number, number?]) => d[2] || 0,
-          elevationScale: 1,
-        })
-    );
-  }, [tracks]);
+  const trackLayers = useMemo(
+    () =>
+      tracks.map(
+        (track) =>
+          new PathLayer({
+            id: `track-${track.id}`,
+            data: track.geojson.features.map((f) =>
+              f.geometry.coordinates.map((coord) => {
+                const c = coord as [number, number];
+                return [c[0], c[1]];
+              })
+            ),
+            getPath: (d) => d,
+            getColor: hexToRgbTuple(track.color, 160) || [255, 0, 0, 160],
+            widthMinPixels: 4,
+            extruded: true,
+            getElevation: (d: [number, number, number?]) => d[2] || 0,
+            elevationScale: 1,
+          })
+      ),
+    [tracks]
+  );
 
   const markerLayer = useMemo(() => {
     const points = positionsByTime
@@ -76,7 +80,10 @@ export default function MainMap() {
       viewState={{ ...viewState }}
       onViewStateChange={({ viewState }) => {
         if (isMapViewState(viewState)) {
-          setViewState(viewState);
+          setViewState({
+            ...viewState,
+            zoom: Math.min(maxZoom, viewState.zoom),
+          });
         }
       }}
       controller={true}
