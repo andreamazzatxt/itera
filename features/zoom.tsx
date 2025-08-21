@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { MapViewState, useMap } from "@/contexts/map-context";
-import { LinearInterpolator } from "@deck.gl/core";
+import { useMap } from "@/contexts/map-context";
+import { LinearInterpolator, MapViewState } from "@deck.gl/core";
 import { ZoomIn, ZoomOut } from "lucide-react";
 
 export const Zoom = ({}) => {
