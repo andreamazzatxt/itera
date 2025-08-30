@@ -46,7 +46,9 @@ export const TimeControlPanel = () => {
 
     if (
       !markersOutsideView(
-        positionsByTime.map((p) => [p.coordinates![0], p.coordinates![1]]),
+        positionsByTime
+          .filter((p) => p.coordinates)
+          .map((p) => [p.coordinates![0], p.coordinates![1]]),
         viewBounds
       )
     ) {
