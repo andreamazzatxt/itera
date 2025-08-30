@@ -23,7 +23,7 @@ export function FloatingDrawer({
       {open && (
         <motion.div
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-end justify-center px-4 py-4 pointer-events-none"
+          className="fixed inset-0 z-50 flex items-end justify-center p-2 sm:p-8 pointer-events-none"
         >
           {/* Card drawer */}
           <motion.div
@@ -36,10 +36,9 @@ export function FloatingDrawer({
               glass
                 ? "bg-gray-500 bg-clip-padding backdrop-filter  backdrop-blur-2xl bg-opacity-50 backdrop-saturate-100 backdrop-contrast-100 text-white font-semibold"
                 : "bg-white",
-              "relative z-10  rounded-2xl shadow-xl w-full p-4 overflow-hidden pointer-events-auto",
+              "relative z-10  rounded-2xl shadow-xl w-full p-2 sm:p-4 overflow-hidden pointer-events-auto",
               className
             )}
-            style={{ margin: 24 }}
           >
             {onClose && (
               <button onClick={onClose} className="absolute top-2 right-2">

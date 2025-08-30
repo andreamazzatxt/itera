@@ -37,9 +37,9 @@ export const TrackControlPanel = () => {
   };
   if (tracks.length === 0)
     return (
-      <FloatingDrawer open className="max-w-sm" glass>
+      <FloatingDrawer open className="sm:max-w-sm" glass>
         <div className="p-4 w-full flex flex-col">
-          <div className="flex flex-row justify-around gap-2 w-full">
+          <div className="flex flex-col sm:flex-row justify-around gap-2 w-full">
             <Button variant="secondary" onClick={loadExampleTracks}>
               <FlaskConical /> Load Example Tracks
             </Button>

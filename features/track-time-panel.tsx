@@ -86,8 +86,11 @@ export const TimeControlPanel = () => {
       </Button>
       <FloatingDrawer open={openDrawer === DRAWER.TIME} onClose={close} glass>
         <div className="w-full">
-          <div className="flex items-center mb-2 space-x-2">
-            <h2 className="text-lg font-medium">Select Time</h2>
+          <div className="flex items-center justify-between mb-2 space-x-2 px-4">
+            <h2 className="hidden sm:block text-lg font-medium">Select Time</h2>
+            <div className="mt-2 font-mono text-xl sm:text-lg mr-8">
+              {formatTimestamp(time ? +time : 0)}
+            </div>
           </div>
           <div className="flex flex-col gap-4 p-4">
             <Slider
@@ -98,9 +101,6 @@ export const TimeControlPanel = () => {
               onValueChange={handleValueChange}
               aria-label="Time slider"
             />
-            <div className="mt-2 font-mono text-sm">
-              {formatTimestamp(time ? +time : 0)}
-            </div>
           </div>
         </div>
       </FloatingDrawer>
