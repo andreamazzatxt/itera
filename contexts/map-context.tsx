@@ -14,6 +14,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { exampleTracks } from "./example-tracks";
 
 const mapCenter = [12.4964, 41.9028];
 const mapZoom = 15;
@@ -31,6 +32,7 @@ const MapContext = createContext<{
   centerMap: (value?: TrackData[]) => void;
   viewState: MapViewState;
   setViewState: Dispatch<SetStateAction<MapViewState>>;
+  loadExampleTracks: () => void;
 }>({
   tracks: [],
   setTracks: () => {},
@@ -48,6 +50,7 @@ const MapContext = createContext<{
   },
   setViewState: () => {},
   centerMap: () => {},
+  loadExampleTracks: () => {},
 });
 export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -99,6 +102,12 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
     [centerMapState]
   );
 
+  const loadExampleTracks = useCallback(() => {
+    setTracks(exampleTracks);
+    setTime(0);
+    centerMap(exampleTracks);
+  }, [centerMap, setTime, setTracks]);
+
   useEffect(() => {
     if (!tracks.length) {
       centerMap();
@@ -110,7 +119,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         tracks,
         setTracks,
-        time,
+        time: time || minTime || 0,
         setTime,
         minTime,
         maxTime,
@@ -119,6 +128,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
         viewState,
         setViewState,
         centerMap,
+        loadExampleTracks,
       }}
     >
       {children}

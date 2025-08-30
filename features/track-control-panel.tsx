@@ -1,19 +1,21 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import { FloatingDrawer } from "@/components/ui/floating-drawer";
+import { Separator } from "@/components/ui/separator";
+import { DRAWER, useDrawer } from "@/contexts/drawer-context";
 import { useMap } from "@/contexts/map-context";
-import { DraftingCompass } from "lucide-react";
+import {
+  DraftingCompass,
+  FlaskConical,
+  Import,
+  Trash2Icon,
+} from "lucide-react";
+import { Fragment } from "react";
 
 export const TrackControlPanel = () => {
-  const { tracks, setTracks, centerMap } = useMap();
+  const { openDrawer, open, close } = useDrawer();
+  const { tracks, setTracks, centerMap, loadExampleTracks } = useMap();
 
   const handleRemoveTrack = (trackId: string) => {
     if (confirm("Are you sure you want to remove this track?")) {
@@ -33,52 +35,77 @@ export const TrackControlPanel = () => {
       centerMap();
     }
   };
-  if (tracks.length === 0) return null;
+  if (tracks.length === 0)
+    return (
+      <FloatingDrawer open className="max-w-sm" glass>
+        <div className="p-4 w-full flex flex-col">
+          <div className="flex flex-row justify-around gap-2 w-full">
+            <Button variant="secondary" onClick={loadExampleTracks}>
+              <FlaskConical /> Load Example Tracks
+            </Button>
+
+            <Button>
+              <Import />
+              Import GPX
+            </Button>
+          </div>
+        </div>
+      </FloatingDrawer>
+    );
 
   return (
-    <Drawer>
-      <DrawerTrigger asChild>
-        <Button size="circular">
-          <DraftingCompass />
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent noOverlay className="p-6">
-        <DrawerHeader>
-          <DrawerTitle>Tracks</DrawerTitle>
-          <DrawerDescription>
-            Manage your saved tracks. You can remove individual tracks or clear
-            all.
-          </DrawerDescription>
-        </DrawerHeader>
+    <>
+      <Button
+        size="circular"
+        onClick={() =>
+          DRAWER.TRACKS === openDrawer ? close() : open(DRAWER.TRACKS)
+        }
+      >
+        <DraftingCompass />
+      </Button>
+      <FloatingDrawer
+        open={openDrawer === DRAWER.TRACKS}
+        onClose={close}
+        className="max-w-3xl"
+        glass
+      >
+        <div className="flex flex-col gap-4">
+          <div>
+            <h2 className="text-lg font-medium">Tracks</h2>
+            <p className="text-sm font-thin">
+              Manage your saved tracks. You can remove individual tracks or
+              clear all.
+            </p>
+          </div>
 
-        <ul className="space-y-2">
-          {tracks.map((track) => (
-            <li key={track.id} className="flex items-center justify-between">
-              <span className="font-medium">{track.name}</span>
-              <button
-                onClick={() => handleRemoveTrack(track.id)}
-                className="text-red-600 hover:text-red-800"
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-        <div className="flex gap-2">
-          <button
-            onClick={() => console.log("Tracks:", tracks)}
-            className="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-          >
-            Load All
-          </button>
-          <button
-            onClick={handleClearAllTracks}
-            className="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-          >
-            Clear All
-          </button>
+          <ul className="space-y-2">
+            {tracks.map((track) => (
+              <Fragment key={track.id}>
+                <li className="flex items-center gap-2">
+                  <div
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: track.color }}
+                  />
+                  <span className="font-medium">{track.name}</span>
+
+                  <Button
+                    onClick={() => handleRemoveTrack(track.id)}
+                    variant="ghost"
+                  >
+                    <Trash2Icon stroke="var(--destructive)" />
+                  </Button>
+                </li>
+                <Separator />
+              </Fragment>
+            ))}
+          </ul>
+          <div className="flex gap-2 justify-end">
+            <Button onClick={handleClearAllTracks} variant="destructive">
+              Clear All
+            </Button>
+          </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </FloatingDrawer>
+    </>
   );
 };

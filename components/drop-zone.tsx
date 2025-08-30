@@ -102,10 +102,7 @@ export default function DropZone({
       {isDragOver && (
         <div className="fixed inset-0 bg-teal-800/50 flex items-center justify-center z-[9999] pointer-events-none">
           <Card className="bg-white p-8 rounded-lg shadow-xl text-center pointer-events-auto">
-            <MonitorUp className="text-6xl mb-4 m-auto" />
-            <h3 className="text-xl font-bold text-gray-800 mb-2">
-              Drop GPX files here
-            </h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Drop it</h3>
             <p className="text-gray-600">
               Your files will be uploaded to the map
             </p>
@@ -113,13 +110,15 @@ export default function DropZone({
         </div>
       )}
 
-      <TrackConfigModal
-        isOpen={isModalOpen}
-        onClose={handleTrackConfigCancel}
-        onSave={handleTrackConfigSave}
-        defaultName={pendingTrackData?.filename.replace(".gpx", "") || ""}
-        pendingTrackData={pendingTrackData}
-      />
+      {isModalOpen && (
+        <TrackConfigModal
+          isOpen={isModalOpen}
+          onClose={handleTrackConfigCancel}
+          onSave={handleTrackConfigSave}
+          defaultName={pendingTrackData?.filename.replace(".gpx", "") || ""}
+          pendingTrackData={pendingTrackData}
+        />
+      )}
     </div>
   );
 }

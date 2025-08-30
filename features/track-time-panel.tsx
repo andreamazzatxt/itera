@@ -1,9 +1,20 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import { Slider } from "@/components/ui/slider";
+import { DRAWER, useDrawer } from "@/contexts/drawer-context";
 import { useMap } from "@/contexts/map-context";
 import { formatTimestamp } from "@/lib/utils";
+import { LinearInterpolator, MapViewState } from "@deck.gl/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { Clock } from "lucide-react";
 import {
   getBounds,
   getPositionsAtTime,
@@ -12,19 +23,10 @@ import {
   markersOutsideView,
   type TrackData,
 } from "../lib/gps-utils";
-import { Button } from "@/components/ui/button";
-import { Clock } from "lucide-react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { LinearInterpolator, MapViewState } from "@deck.gl/core";
+import { FloatingDrawer } from "@/components/ui/floating-drawer";
 
 export const TimeControlPanel = () => {
+  const { open, close, openDrawer } = useDrawer();
   const { minTime, maxTime, time, viewState, setTime, setViewState } = useMap();
   const [tracks] = useLocalStorage<TrackData[]>("tracks", []);
 
@@ -71,33 +73,35 @@ export const TimeControlPanel = () => {
   if (tracks.length === 0) return null;
 
   return (
-    <Drawer>
-      <DrawerTrigger asChild>
-        <Button size="circular">
-          <Clock />
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent noOverlay>
-        <DrawerHeader>
-          <DrawerTitle>Select Time</DrawerTitle>
-          <DrawerDescription>
-            Use the slider to select a specific time for the tracks.
-          </DrawerDescription>
-        </DrawerHeader>
-        <div className="flex flex-col gap-4 p-4">
-          <Slider
-            value={[time ? +time : 0]}
-            min={minTime}
-            max={maxTime}
-            step={1000}
-            onValueChange={handleValueChange}
-            aria-label="Time slider"
-          />
-          <div className="mt-2 font-mono text-sm">
-            {formatTimestamp(time ? +time : 0)}
+    <>
+      <Button
+        size="circular"
+        onClick={() =>
+          openDrawer === DRAWER.TIME ? close() : open(DRAWER.TIME)
+        }
+      >
+        <Clock />
+      </Button>
+      <FloatingDrawer open={openDrawer === DRAWER.TIME} onClose={close} glass>
+        <div className="w-full">
+          <div className="flex items-center mb-2 space-x-2">
+            <h2 className="text-lg font-medium">Select Time</h2>
+          </div>
+          <div className="flex flex-col gap-4 p-4">
+            <Slider
+              value={[time ? +time : 0]}
+              min={minTime}
+              max={maxTime}
+              step={1000}
+              onValueChange={handleValueChange}
+              aria-label="Time slider"
+            />
+            <div className="mt-2 font-mono text-sm">
+              {formatTimestamp(time ? +time : 0)}
+            </div>
           </div>
         </div>
-      </DrawerContent>
-    </Drawer>
+      </FloatingDrawer>
+    </>
   );
 };

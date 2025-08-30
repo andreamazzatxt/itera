@@ -17,6 +17,7 @@ import {
   type GeoJSONCollection,
 } from "../lib/gps-utils";
 import { useMap } from "@/contexts/map-context";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 export interface TrackConfig {
   name: string;
@@ -51,21 +52,13 @@ export function TrackConfigModal({
   defaultName = "",
   pendingTrackData,
 }: TrackConfigModalProps) {
-  const { tracks } = useMap();
+  const [tracks] = useLocalStorage<TrackData[]>("tracks", []);
   const [trackName, setTrackName] = useState(defaultName);
-  const [selectedColor, setSelectedColor] = useState(DEFAULT_COLORS[0]);
-
-  // Reset form when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setTrackName(defaultName);
-      setSelectedColor(
-        DEFAULT_COLORS.filter(
-          (color) => !tracks.some((track) => track.color === color)
-        )[0]
-      );
-    }
-  }, [isOpen, defaultName, tracks]);
+  const [selectedColor, setSelectedColor] = useState(
+    DEFAULT_COLORS.filter(
+      (color) => !tracks.some((track) => track.color === color)
+    )[0]
+  );
 
   const handleSave = (config: TrackConfig) => {
     if (pendingTrackData) {
@@ -89,10 +82,10 @@ export function TrackConfigModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCancel}>
-      <DialogContent className="sm:max-w-md z-[9999]">
+      <DialogContent className="sm:max-w-md z-[9999]" glass>
         <DialogHeader>
           <DialogTitle>Track Config</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-muted font-thin">
             Configure the track name and color before saving.
           </DialogDescription>
         </DialogHeader>
@@ -136,7 +129,7 @@ export function TrackConfigModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button variant="ghost" onClick={handleCancel}>
             Cancel
           </Button>
           <Button
