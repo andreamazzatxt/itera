@@ -1,5 +1,6 @@
 "use client";
 
+import { confirmModal } from "@/components/confirm-modal";
 import { Button } from "@/components/ui/button";
 import { FloatingDrawer } from "@/components/ui/floating-drawer";
 import { Separator } from "@/components/ui/separator";
@@ -17,8 +18,12 @@ export const TrackControlPanel = () => {
   const { openDrawer, open, close } = useDrawer();
   const { tracks, setTracks, centerMap, loadExampleTracks } = useMap();
 
-  const handleRemoveTrack = (trackId: string) => {
-    if (confirm("Are you sure you want to remove this track?")) {
+  const handleRemoveTrack = async (trackId: string) => {
+    const confirmed = await confirmModal({
+      title: "Are you sure you want to remove this track?",
+    });
+
+    if (confirmed) {
       setTracks((prev) => {
         const newTracks = prev.filter((track) => track.id !== trackId);
         if (newTracks.length > 0) {
@@ -29,8 +34,11 @@ export const TrackControlPanel = () => {
     }
   };
 
-  const handleClearAllTracks = () => {
-    if (confirm("Are you sure you want to delete all saved tracks?")) {
+  const handleClearAllTracks = async () => {
+    const confirmed = await confirmModal({
+      title: "Are you sure you want to delete all saved tracks?",
+    });
+    if (confirmed) {
       setTracks([]);
       centerMap();
     }
@@ -72,7 +80,7 @@ export const TrackControlPanel = () => {
         <div className="flex flex-col gap-4">
           <div>
             <h2 className="text-lg font-medium">Tracks</h2>
-            <p className="text-sm font-thin">
+            <p className="text-sm font-light">
               Manage your saved tracks. You can remove individual tracks or
               clear all.
             </p>
