@@ -1,14 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import { Slider } from "@/components/ui/slider";
+import { FloatingDrawer } from "@/components/ui/floating-drawer";
+import { TimeScrollPicker } from "@/components/ui/time-scroll-picker";
 import { DRAWER, useDrawer } from "@/contexts/drawer-context";
 import { useMap } from "@/contexts/map-context";
 import { formatTimestamp } from "@/lib/utils";
@@ -23,7 +17,7 @@ import {
   markersOutsideView,
   type TrackData,
 } from "../lib/gps-utils";
-import { FloatingDrawer } from "@/components/ui/floating-drawer";
+import { Slider } from "@/components/ui/slider";
 
 export const TimeControlPanel = () => {
   const { open, close, openDrawer } = useDrawer();
@@ -92,7 +86,16 @@ export const TimeControlPanel = () => {
               {formatTimestamp(time ? +time : 0)}
             </div>
           </div>
-          <div className="flex flex-col gap-4">
+          <div className="sm:hidden">
+            <TimeScrollPicker
+              startDate={new Date(minTime!)}
+              endDate={new Date(maxTime!)}
+              stepMinutes={5}
+              selectedDate={time ? new Date(+time) : undefined}
+              onChange={(date) => handleValueChange([date.getTime()])}
+            />
+          </div>
+          <div className="hidden sm:block">
             <Slider
               value={[time ? +time : 0]}
               min={minTime}
