@@ -72,6 +72,9 @@ export default function MainMap() {
       getPosition: (d) => d.position,
       getSize: 40,
       getColor: (d) => d.color,
+      transitions: {
+        getPosition: 100,
+      },
     });
   }, [positionsByTime, tracks]);
 
