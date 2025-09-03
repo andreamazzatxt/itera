@@ -36,7 +36,7 @@ export function FloatingDrawer({
               glass
                 ? "bg-gray-500 bg-clip-padding backdrop-filter  backdrop-blur-2xl bg-opacity-50 backdrop-saturate-100 backdrop-contrast-100 text-white font-semibold"
                 : "bg-white",
-              "relative z-10  rounded-2xl shadow-xl w-full p-2 sm:p-4 overflow-hidden pointer-events-auto",
+              "relative z-10  rounded-2xl shadow-xl w-full p-6 overflow-hidden pointer-events-auto",
               className
             )}
           >
