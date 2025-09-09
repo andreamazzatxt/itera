@@ -99,7 +99,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
       lastFrameRef.current = now;
 
       setTimeState((prev) => {
-        const next = prev + step * deltaSec * playbackSpeed;
+        const next = (prev || minTime) + step * deltaSec * playbackSpeed;
 
         syncRef.current += deltaSec;
         if (syncRef.current >= 0.5) {
@@ -203,7 +203,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         tracks,
         setTracks,
-        time,
+        time: time || minTime || 0,
         setTime,
         minTime,
         maxTime,
