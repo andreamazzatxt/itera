@@ -3,16 +3,18 @@
 import { useMap } from "@/contexts/map-context";
 import { getPositionsAtTime } from "@/lib/gps-utils";
 import { hexToRgbTuple, isMapViewState } from "@/lib/utils";
-import { IconLayer, PathLayer } from "@deck.gl/layers";
+import { PathLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { useMemo } from "react";
-import { Map } from "react-map-gl/maplibre";
+import { Map, Marker } from "react-map-gl/maplibre";
 import { useFlyOver } from "./use-fly-over";
+import { MyCustomMarker } from "./marker";
 
 const maxZoom = 18;
 
 export default function MainMap() {
   const { tracks, time, viewState, setViewState } = useMap();
+
   const positionsByTime = getPositionsAtTime(tracks, time);
 
   useFlyOver({
@@ -38,45 +40,11 @@ export default function MainMap() {
             extruded: true,
             getElevation: (d: [number, number, number?]) => d[2] || 0,
             elevationScale: 1,
+            zIndex: 1,
           })
       ),
     [tracks]
   );
-
-  const markerLayer = useMemo(() => {
-    const points = positionsByTime
-      .filter((p) => p.coordinates)
-      .map((p) => ({
-        position: [p.coordinates![0], p.coordinates![1]],
-        color: hexToRgbTuple(
-          tracks.find((t) => t.id === p.trackId)?.color || "#0000ff"
-        ) || [0, 0, 255],
-      }));
-
-    return new IconLayer({
-      id: "markers",
-      data: points,
-      pickable: true,
-      iconAtlas: "/icons/marker-atlas.png",
-      iconMapping: {
-        marker: {
-          x: 0,
-          y: 0,
-          width: 128,
-          height: 128,
-          anchorY: 128,
-          mask: true,
-        },
-      },
-      getIcon: () => "marker",
-      getPosition: (d) => d.position,
-      getSize: 40,
-      getColor: (d) => d.color,
-      transitions: {
-        getPosition: 100,
-      },
-    });
-  }, [positionsByTime, tracks]);
 
   return (
     <DeckGL
@@ -90,7 +58,7 @@ export default function MainMap() {
         }
       }}
       controller={true}
-      layers={[markerLayer, ...trackLayers]}
+      layers={[...trackLayers]}
     >
       <Map
         mapLib={import("maplibre-gl")}
@@ -113,7 +81,25 @@ export default function MainMap() {
             },
           ],
         }}
-      ></Map>
+      >
+        {positionsByTime
+          .filter((p) => p.coordinates)
+          .map((p) => {
+            const trackColor =
+              tracks.find((t) => t.id === p.trackId)?.color || "#0000ff";
+            return (
+              <Marker
+                key={p.trackId}
+                longitude={p.coordinates![0]}
+                latitude={p.coordinates![1]}
+                anchor="bottom"
+                style={{ zIndex: 10 }}
+              >
+                <MyCustomMarker color={trackColor} />
+              </Marker>
+            );
+          })}
+      </Map>
     </DeckGL>
   );
 }

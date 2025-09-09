@@ -12,6 +12,8 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react";
 import { exampleTracks } from "./example-tracks";
@@ -22,9 +24,8 @@ const mapZoom = 15;
 const MapContext = createContext<{
   tracks: TrackData[];
   setTracks: Dispatch<SetStateAction<TrackData[]>>;
-  clearAllTracks?: () => void;
   time: number;
-  setTime: Dispatch<SetStateAction<number>>;
+  setTime: (val: number) => void;
   minTime?: number;
   maxTime?: number;
   is3d?: boolean;
@@ -33,6 +34,9 @@ const MapContext = createContext<{
   viewState: MapViewState;
   setViewState: Dispatch<SetStateAction<MapViewState>>;
   loadExampleTracks: () => void;
+  play: () => void;
+  pause: () => void;
+  isPlaying: boolean;
 }>({
   tracks: [],
   setTracks: () => {},
@@ -51,18 +55,98 @@ const MapContext = createContext<{
   setViewState: () => {},
   centerMap: () => {},
   loadExampleTracks: () => {},
+  play: () => {},
+  pause: () => {},
+  isPlaying: false,
 });
+
 export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { longitude, latitude } = useGeolocation();
 
   const [tracks, setTracks] = useLocalStorage<TrackData[]>("tracks", []);
-  const [time, setTime] = useLocalStorage<number>("time", 0);
+  const [timeLS, setTimeLS] = useLocalStorage<number>("time", 0);
+  const [time, setTimeState] = useState<number>(timeLS || 0);
   const [is3d, setIs3d] = useLocalStorage<boolean>("is3d", false);
 
   const { minTime, maxTime } =
     findMinMaxTime(tracks.map((track) => track.geojson.features).flat()) || {};
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const rafRef = useRef<number | null>(null);
+  const lastFrameRef = useRef<number | null>(null);
+  const syncRef = useRef<number>(0);
+
+  const playbackDuration = 100;
+  const playbackSpeed = 1.5;
+
+  const step = useMemo(() => {
+    if (!minTime || !maxTime) return 1;
+    const totalTime = maxTime - minTime;
+    return totalTime / playbackDuration;
+  }, [minTime, maxTime, playbackDuration]);
+
+  const play = useCallback(() => {
+    if (isPlaying || !minTime || !maxTime) return;
+    setIsPlaying(true);
+
+    const loop = (now: number) => {
+      if (!lastFrameRef.current) {
+        lastFrameRef.current = now;
+      }
+      const deltaSec = (now - lastFrameRef.current) / 1000;
+      lastFrameRef.current = now;
+
+      setTimeState((prev) => {
+        const next = prev + step * deltaSec * playbackSpeed;
+
+        syncRef.current += deltaSec;
+        if (syncRef.current >= 0.5) {
+          setTimeLS(next);
+          syncRef.current = 0;
+        }
+
+        if (next >= maxTime) {
+          cancelAnimationFrame(rafRef.current!);
+          setIsPlaying(false);
+          setTimeLS(maxTime);
+          return maxTime;
+        }
+
+        return next;
+      });
+
+      rafRef.current = requestAnimationFrame(loop);
+    };
+
+    rafRef.current = requestAnimationFrame(loop);
+  }, [isPlaying, minTime, maxTime, step, playbackSpeed, setTimeLS]);
+
+  const pause = useCallback(() => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
+    rafRef.current = null;
+    lastFrameRef.current = null;
+    setIsPlaying(false);
+    setTimeLS(time);
+  }, [time, setTimeLS]);
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  const setTime = useCallback(
+    (val: number) => {
+      pause();
+      setTimeState(val);
+      setTimeLS(val);
+    },
+    [pause, setTimeLS]
+  );
 
   const centerMapState = useCallback(
     (value?: TrackData[]) => {
@@ -119,7 +203,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         tracks,
         setTracks,
-        time: time || minTime || 0,
+        time,
         setTime,
         minTime,
         maxTime,
@@ -129,12 +213,16 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
         setViewState,
         centerMap,
         loadExampleTracks,
+        play,
+        pause,
+        isPlaying,
       }}
     >
       {children}
     </MapContext.Provider>
   );
 };
+
 export const useMap = () => {
   const context = useContext(MapContext);
   if (!context) {

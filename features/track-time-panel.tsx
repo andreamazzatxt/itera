@@ -21,7 +21,17 @@ import { Slider } from "@/components/ui/slider";
 
 export const TimeControlPanel = () => {
   const { open, close, openDrawer } = useDrawer();
-  const { minTime, maxTime, time, viewState, setTime, setViewState } = useMap();
+  const {
+    minTime,
+    maxTime,
+    time,
+    viewState,
+    setTime,
+    setViewState,
+    play,
+    pause,
+    isPlaying,
+  } = useMap();
   const [tracks] = useLocalStorage<TrackData[]>("tracks", []);
 
   function handleValueChange(newValue: number[]) {
@@ -85,6 +95,13 @@ export const TimeControlPanel = () => {
             <div className="mt-2 font-mono text-xl sm:text-lg mr-8">
               {formatTimestamp(time ? +time : 0)}
             </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={isPlaying ? pause : play}
+            >
+              {isPlaying ? "Pause" : "Play"}
+            </Button>
           </div>
           <div className="sm:hidden">
             <TimeScrollPicker
