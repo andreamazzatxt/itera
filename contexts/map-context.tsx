@@ -13,11 +13,12 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
 import { exampleTracks } from "./example-tracks";
+
+const SCALE = 1000;
 
 const MapContext = createContext<{
   tracks: TrackData[];
@@ -33,6 +34,8 @@ const MapContext = createContext<{
   play: () => void;
   pause: () => void;
   isPlaying: boolean;
+  playbackSpeed: number;
+  setPlaybackSpeed: Dispatch<SetStateAction<number>>;
 }>({
   tracks: [],
   setTracks: () => {},
@@ -52,6 +55,8 @@ const MapContext = createContext<{
   play: () => {},
   pause: () => {},
   isPlaying: false,
+  playbackSpeed: 1,
+  setPlaybackSpeed: () => {},
 });
 
 export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -63,22 +68,13 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [timeLS, setTimeLS] = useLocalStorage<number>("time", 0);
   const [time, setTimeState] = useState<number>(timeLS || 0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(100);
 
   const { minTime, maxTime } =
     findMinMaxTime(tracks.map((track) => track.geojson.features).flat()) || {};
 
   const rafRef = useRef<number | null>(null);
   const lastFrameRef = useRef<number | null>(null);
-  const syncRef = useRef<number>(0);
-
-  const playbackDuration = 100;
-  const playbackSpeed = 1.5;
-
-  const step = useMemo(() => {
-    if (!minTime || !maxTime) return 1;
-    const totalTime = maxTime - minTime;
-    return totalTime / playbackDuration;
-  }, [minTime, maxTime, playbackDuration]);
 
   const play = useCallback(() => {
     if (isPlaying || !minTime || !maxTime) return;
@@ -92,20 +88,12 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
       lastFrameRef.current = now;
 
       setTimeState((prev) => {
-        const next = (prev || minTime) + step * deltaSec * playbackSpeed;
-
-        syncRef.current += deltaSec;
-        if (syncRef.current >= 0.5) {
-          syncRef.current = 0;
-        }
-
+        const next = (prev || minTime) + deltaSec * playbackSpeed * SCALE;
         if (next >= maxTime) {
           cancelAnimationFrame(rafRef.current!);
           setIsPlaying(false);
-
           return maxTime;
         }
-
         return next;
       });
 
@@ -113,23 +101,15 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     rafRef.current = requestAnimationFrame(loop);
-  }, [isPlaying, minTime, maxTime, step, playbackSpeed]);
+  }, [isPlaying, minTime, maxTime, playbackSpeed]);
 
   const pause = useCallback(() => {
-    if (rafRef.current) {
-      cancelAnimationFrame(rafRef.current);
-    }
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = null;
     lastFrameRef.current = null;
     setIsPlaying(false);
     setTimeLS(time);
   }, [time, setTimeLS]);
-
-  useEffect(() => {
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
 
   const setTime = useCallback(
     (val: number) => {
@@ -191,6 +171,8 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
         play,
         pause,
         isPlaying,
+        playbackSpeed,
+        setPlaybackSpeed,
       }}
     >
       {children}
