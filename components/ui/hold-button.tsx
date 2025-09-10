@@ -37,8 +37,14 @@ export function HoldButton({
       onMouseDown={startHold}
       onMouseUp={stopHold}
       onMouseLeave={stopHold}
-      onTouchStart={startHold}
-      onTouchEnd={stopHold}
+      onTouchStart={(e) => {
+        e.preventDefault();
+        startHold();
+      }}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        stopHold();
+      }}
     >
       {children}
     </Button>
