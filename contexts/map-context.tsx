@@ -30,7 +30,7 @@ const MapContext = createContext<{
   tracks: TrackData[];
   setTracks: Dispatch<SetStateAction<TrackData[]>>;
   time: number;
-  setTime: (val: number) => void;
+  setTime: (val: number | ((prev: number) => number)) => void;
   minTime?: number;
   maxTime?: number;
   centerMap: (value?: TrackData[]) => void;
@@ -119,7 +119,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [time, setTimeLS]);
 
   const setTime = useCallback(
-    (val: number) => {
+    (val: number | ((prev: number) => number)) => {
       pause();
       setTimeState(val);
       setTimeLS(val);

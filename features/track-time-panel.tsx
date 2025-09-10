@@ -27,6 +27,7 @@ import {
 } from "../lib/gps-utils";
 import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { HoldButton } from "@/components/ui/hold-button";
 
 export const TimeControlPanel = () => {
   const { open, close, openDrawer } = useDrawer();
@@ -107,9 +108,14 @@ export const TimeControlPanel = () => {
             </div>
 
             <div className="flex gap-2 justify-center w-full">
-              <Button variant="ghost" onClick={() => setTime(time - 60000)}>
+              <HoldButton
+                onHold={() => {
+                  setTime((p) => p - 60000);
+                }}
+                className="transition-all active:scale-125 active:animate-pulse"
+              >
                 <FastForward className="size-4 rotate-180" />
-              </Button>
+              </HoldButton>
               <Button variant="ghost" onClick={isPlaying ? pause : play}>
                 {isPlaying ? (
                   <Pause className="size-8" fill="white" />
@@ -117,9 +123,12 @@ export const TimeControlPanel = () => {
                   <Play className="size-8" fill="white" />
                 )}
               </Button>
-              <Button variant="ghost" onClick={() => setTime(time + 60000)}>
+              <HoldButton
+                onHold={() => setTime((p) => p + 60000)}
+                className="transition-all active:scale-125 active:animate-pulse"
+              >
                 <FastForward className="size-4" />
-              </Button>
+              </HoldButton>
             </div>
           </div>
           <div className="sm:hidden mx-[-36px]">
