@@ -1,6 +1,9 @@
 import { MapViewState } from "@deck.gl/core";
 import toGeoJSON from "@mapbox/togeojson";
 
+const mapCenter = [12.4964, 41.9028];
+const mapZoom = 16;
+
 export interface GeoJSONFeature {
   type: "Feature";
   geometry: {
@@ -309,3 +312,27 @@ export function markersOutsideView(
     );
   });
 }
+
+export const getCenterState = (
+  positions: [number, number][],
+  longitude?: number | null,
+  latitude?: number | null,
+  zoom = mapZoom
+) => {
+  if (positions.length > 0) {
+    const lats = positions.map((c) => c[0]);
+    const lngs = positions.map((c) => c[1]);
+    return {
+      longitude: (Math.min(...lngs) + Math.max(...lngs)) / 2,
+      latitude: (Math.min(...lats) + Math.max(...lats)) / 2,
+      zoom,
+      pitch: 45,
+    };
+  }
+  return {
+    longitude: longitude ?? mapCenter[0],
+    latitude: latitude ?? mapCenter[1],
+    zoom,
+    pitch: 45,
+  };
+};

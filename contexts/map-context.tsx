@@ -1,6 +1,7 @@
 import {
   findMinMaxTime,
   getAllTrackCoordinates,
+  getCenterState,
   TrackData,
 } from "@/lib/gps-utils";
 import { FlyToInterpolator, MapViewState } from "@deck.gl/core";
@@ -17,9 +18,6 @@ import {
   useState,
 } from "react";
 import { exampleTracks } from "./example-tracks";
-
-const mapCenter = [12.4964, 41.9028];
-const mapZoom = 15;
 
 const MapContext = createContext<{
   tracks: TrackData[];
@@ -42,11 +40,10 @@ const MapContext = createContext<{
   setTime: () => {},
   minTime: undefined,
   maxTime: undefined,
-
   viewState: {
-    longitude: mapCenter[0],
-    latitude: mapCenter[1],
-    zoom: mapZoom,
+    longitude: 0,
+    latitude: 0,
+    zoom: 0,
     pitch: 45,
   },
   setViewState: () => {},
@@ -65,11 +62,11 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tracks, setTracks] = useLocalStorage<TrackData[]>("tracks", []);
   const [timeLS, setTimeLS] = useLocalStorage<number>("time", 0);
   const [time, setTimeState] = useState<number>(timeLS || 0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const { minTime, maxTime } =
     findMinMaxTime(tracks.map((track) => track.geojson.features).flat()) || {};
 
-  const [isPlaying, setIsPlaying] = useState(false);
   const rafRef = useRef<number | null>(null);
   const lastFrameRef = useRef<number | null>(null);
   const syncRef = useRef<number>(0);
@@ -99,14 +96,13 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
         syncRef.current += deltaSec;
         if (syncRef.current >= 0.5) {
-          setTimeLS(next);
           syncRef.current = 0;
         }
 
         if (next >= maxTime) {
           cancelAnimationFrame(rafRef.current!);
           setIsPlaying(false);
-          setTimeLS(maxTime);
+
           return maxTime;
         }
 
@@ -117,7 +113,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     rafRef.current = requestAnimationFrame(loop);
-  }, [isPlaying, minTime, maxTime, step, playbackSpeed, setTimeLS]);
+  }, [isPlaying, minTime, maxTime, step, playbackSpeed]);
 
   const pause = useCallback(() => {
     if (rafRef.current) {
@@ -147,22 +143,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const centerMapState = useCallback(
     (value?: TrackData[]) => {
       const allCoords = getAllTrackCoordinates(value || []);
-      if (allCoords.length > 0) {
-        const lats = allCoords.map((c) => c[0]);
-        const lngs = allCoords.map((c) => c[1]);
-        return {
-          longitude: (Math.min(...lngs) + Math.max(...lngs)) / 2,
-          latitude: (Math.min(...lats) + Math.max(...lats)) / 2,
-          zoom: mapZoom,
-          pitch: 45,
-        };
-      }
-      return {
-        longitude: longitude ?? mapCenter[0],
-        latitude: latitude ?? mapCenter[1],
-        zoom: mapZoom,
-        pitch: 45,
-      };
+      return getCenterState(allCoords, longitude, latitude);
     },
     [longitude, latitude]
   );
