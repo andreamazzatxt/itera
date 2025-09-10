@@ -20,6 +20,12 @@ import { exampleTracks } from "./example-tracks";
 
 const SCALE = 1000;
 
+export enum Speed {
+  Slow = 100,
+  Medium = 500,
+  Fast = 700,
+}
+
 const MapContext = createContext<{
   tracks: TrackData[];
   setTracks: Dispatch<SetStateAction<TrackData[]>>;
@@ -34,8 +40,8 @@ const MapContext = createContext<{
   play: () => void;
   pause: () => void;
   isPlaying: boolean;
-  playbackSpeed: number;
-  setPlaybackSpeed: Dispatch<SetStateAction<number>>;
+  speed: Speed;
+  setSpeed: (speed: Speed) => void;
 }>({
   tracks: [],
   setTracks: () => {},
@@ -55,8 +61,8 @@ const MapContext = createContext<{
   play: () => {},
   pause: () => {},
   isPlaying: false,
-  playbackSpeed: 1,
-  setPlaybackSpeed: () => {},
+  speed: Speed.Slow,
+  setSpeed: () => {},
 });
 
 export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -68,13 +74,14 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [timeLS, setTimeLS] = useLocalStorage<number>("time", 0);
   const [time, setTimeState] = useState<number>(timeLS || 0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState(100);
+  const [playbackSpeed, setPlaybackSpeed] = useState<Speed>(Speed.Slow);
 
   const { minTime, maxTime } =
     findMinMaxTime(tracks.map((track) => track.geojson.features).flat()) || {};
 
   const rafRef = useRef<number | null>(null);
   const lastFrameRef = useRef<number | null>(null);
+  const speedRef = useRef<Speed>(playbackSpeed);
 
   const play = useCallback(() => {
     if (isPlaying || !minTime || !maxTime) return;
@@ -88,7 +95,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
       lastFrameRef.current = now;
 
       setTimeState((prev) => {
-        const next = (prev || minTime) + deltaSec * playbackSpeed * SCALE;
+        const next = (prev || minTime) + deltaSec * speedRef.current * SCALE;
         if (next >= maxTime) {
           cancelAnimationFrame(rafRef.current!);
           setIsPlaying(false);
@@ -101,7 +108,7 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     rafRef.current = requestAnimationFrame(loop);
-  }, [isPlaying, minTime, maxTime, playbackSpeed]);
+  }, [isPlaying, minTime, maxTime]);
 
   const pause = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -149,11 +156,22 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
     centerMap(exampleTracks);
   }, [centerMap, setTime, setTracks]);
 
+  const setSpeed = useCallback(
+    (speed: Speed) => {
+      setPlaybackSpeed(speed);
+    },
+    [setPlaybackSpeed]
+  );
+
   useEffect(() => {
     if (!tracks.length) {
       centerMap();
     }
   }, [longitude, latitude, tracks.length, centerMap]);
+
+  useEffect(() => {
+    speedRef.current = playbackSpeed;
+  }, [playbackSpeed]);
 
   return (
     <MapContext.Provider
@@ -171,8 +189,8 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
         play,
         pause,
         isPlaying,
-        playbackSpeed,
-        setPlaybackSpeed,
+        speed: playbackSpeed,
+        setSpeed,
       }}
     >
       {children}

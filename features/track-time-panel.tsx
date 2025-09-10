@@ -4,11 +4,19 @@ import { Button } from "@/components/ui/button";
 import { FloatingDrawer } from "@/components/ui/floating-drawer";
 import { TimeScrollPicker } from "@/components/ui/time-scroll-picker";
 import { DRAWER, useDrawer } from "@/contexts/drawer-context";
-import { useMap } from "@/contexts/map-context";
+import { Speed, useMap } from "@/contexts/map-context";
 import { formatTimestamp } from "@/lib/utils";
 import { LinearInterpolator, MapViewState } from "@deck.gl/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
-import { Clock } from "lucide-react";
+import {
+  Clock,
+  FastForward,
+  Pause,
+  Play,
+  Rabbit,
+  Snail,
+  Turtle,
+} from "lucide-react";
 import {
   getBounds,
   getPositionsAtTime,
@@ -18,6 +26,7 @@ import {
   type TrackData,
 } from "../lib/gps-utils";
 import { Slider } from "@/components/ui/slider";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export const TimeControlPanel = () => {
   const { open, close, openDrawer } = useDrawer();
@@ -31,6 +40,8 @@ export const TimeControlPanel = () => {
     play,
     pause,
     isPlaying,
+    speed,
+    setSpeed,
   } = useMap();
   const [tracks] = useLocalStorage<TrackData[]>("tracks", []);
 
@@ -89,27 +100,36 @@ export const TimeControlPanel = () => {
         <Clock />
       </Button>
       <FloatingDrawer open={openDrawer === DRAWER.TIME} onClose={close} glass>
-        <div className="w-full">
-          <div className="flex items-center justify-between mb-2 space-x-2 px-4">
-            <h2 className="hidden sm:block text-lg font-medium">Select Time</h2>
-            <div className="mt-2 font-mono text-xl sm:text-lg mr-8">
+        <div className="w-full flex flex-col gap-5">
+          <div className="flex flex-col items-center justify-center  space-x-2 px-4 gap-6 sm:gap-2">
+            <div className="mt-2 font-mono text-xl sm:text-lg mr-8 self-start">
               {formatTimestamp(time ? +time : 0)}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={isPlaying ? pause : play}
-            >
-              {isPlaying ? "Pause" : "Play"}
-            </Button>
+
+            <div className="flex gap-2 justify-center w-full">
+              <Button variant="ghost" onClick={() => setTime(time - 60000)}>
+                <FastForward className="size-4 rotate-180" />
+              </Button>
+              <Button variant="ghost" onClick={isPlaying ? pause : play}>
+                {isPlaying ? (
+                  <Pause className="size-8" fill="white" />
+                ) : (
+                  <Play className="size-8" fill="white" />
+                )}
+              </Button>
+              <Button variant="ghost" onClick={() => setTime(time + 60000)}>
+                <FastForward className="size-4" />
+              </Button>
+            </div>
           </div>
-          <div className="sm:hidden">
+          <div className="sm:hidden mx-[-36px]">
             <TimeScrollPicker
               startDate={new Date(minTime!)}
               endDate={new Date(maxTime!)}
               stepMinutes={5}
               selectedDate={time ? new Date(+time) : undefined}
               onChange={(date) => handleValueChange([date.getTime()])}
+              isPlaying={isPlaying}
             />
           </div>
           <div className="hidden sm:block">
@@ -122,6 +142,35 @@ export const TimeControlPanel = () => {
               aria-label="Time slider"
             />
           </div>
+          <ToggleGroup
+            value={`${speed}`}
+            type="single"
+            className="self-end"
+            onValueChange={(value) => {
+              if (value) {
+                setSpeed(parseInt(value, 10));
+              }
+            }}
+          >
+            <ToggleGroupItem
+              value={`${Speed.Slow}`}
+              aria-label="Set Slow Speed"
+            >
+              <Snail className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value={`${Speed.Medium}`}
+              aria-label="Set Medium Speed"
+            >
+              <Turtle className="h-4 w-4" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value={`${Speed.Fast}`}
+              aria-label="Set Fast Speed"
+            >
+              <Rabbit className="h-4 w-4" />
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
       </FloatingDrawer>
     </>

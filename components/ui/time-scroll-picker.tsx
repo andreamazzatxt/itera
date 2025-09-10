@@ -14,6 +14,7 @@ interface TimeScrollPickerProps {
   stepMinutes: number;
   selectedDate?: Date;
   onChange?: (date: Date) => void;
+  isPlaying?: boolean;
 }
 
 export function TimeScrollPicker({
@@ -22,6 +23,7 @@ export function TimeScrollPicker({
   stepMinutes,
   selectedDate,
   onChange,
+  isPlaying,
 }: TimeScrollPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [internalSelected, setInternalSelected] = useState<Date>(startDate);
@@ -81,6 +83,10 @@ export function TimeScrollPicker({
     const handleScroll = () => {
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(() => {
+        if (isPlaying) {
+          return;
+        }
+
         const slotEls = Array.from(
           container.querySelectorAll<HTMLElement>("[data-slot-index]")
         );
@@ -109,6 +115,7 @@ export function TimeScrollPicker({
             const newDate = slots[idx];
             if (!selectedDate) setInternalSelected(newDate);
             onChange?.(newDate);
+
             closestEl.scrollIntoView({
               behavior: "smooth",
               inline: "center",
@@ -124,7 +131,7 @@ export function TimeScrollPicker({
     return () => {
       container.removeEventListener("scroll", handleScroll as EventListener);
     };
-  }, [slots, onChange, selectedDate]);
+  }, [slots, onChange, selectedDate, isPlaying]);
 
   const handleClick = (slot: Date, element: HTMLDivElement) => {
     if (!selectedDate) setInternalSelected(slot);
