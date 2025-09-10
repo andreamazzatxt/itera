@@ -101,9 +101,9 @@ export const TimeControlPanel = () => {
         <Clock />
       </Button>
       <FloatingDrawer open={openDrawer === DRAWER.TIME} onClose={close} glass>
-        <div className="w-full flex flex-col gap-5">
+        <div className="w-full flex flex-col gap-5 select-none">
           <div className="flex flex-col items-center justify-center  space-x-2 px-4 gap-6 sm:gap-2">
-            <div className="mt-2 font-mono text-xl sm:text-lg mr-8 self-start">
+            <div className="mt-2 font-mono text-xl sm:text-lg mr-8 self-start select-text">
               {formatTimestamp(time ? +time : 0)}
             </div>
 
