@@ -28,8 +28,6 @@ const MapContext = createContext<{
   setTime: (val: number) => void;
   minTime?: number;
   maxTime?: number;
-  is3d?: boolean;
-  setIs3d?: Dispatch<SetStateAction<boolean>>;
   centerMap: (value?: TrackData[]) => void;
   viewState: MapViewState;
   setViewState: Dispatch<SetStateAction<MapViewState>>;
@@ -44,8 +42,7 @@ const MapContext = createContext<{
   setTime: () => {},
   minTime: undefined,
   maxTime: undefined,
-  is3d: false,
-  setIs3d: () => {},
+
   viewState: {
     longitude: mapCenter[0],
     latitude: mapCenter[1],
@@ -68,7 +65,6 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tracks, setTracks] = useLocalStorage<TrackData[]>("tracks", []);
   const [timeLS, setTimeLS] = useLocalStorage<number>("time", 0);
   const [time, setTimeState] = useState<number>(timeLS || 0);
-  const [is3d, setIs3d] = useLocalStorage<boolean>("is3d", false);
 
   const { minTime, maxTime } =
     findMinMaxTime(tracks.map((track) => track.geojson.features).flat()) || {};
@@ -207,8 +203,6 @@ export const MapContextProvider: React.FC<{ children: React.ReactNode }> = ({
         setTime,
         minTime,
         maxTime,
-        is3d,
-        setIs3d,
         viewState,
         setViewState,
         centerMap,
