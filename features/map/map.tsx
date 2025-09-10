@@ -3,17 +3,26 @@
 import { useMap } from "@/contexts/map-context";
 import { getPositionsAtTime } from "@/lib/gps-utils";
 import { hexToRgbTuple, isMapViewState } from "@/lib/utils";
-import { PathLayer } from "@deck.gl/layers";
+import { PathLayer, IconLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
-import { useMemo } from "react";
-import { Map, Marker } from "react-map-gl/maplibre";
+import { useMemo, useState } from "react";
+import { Map } from "react-map-gl/maplibre";
 import { useFlyOver } from "./use-fly-over";
-import { MyCustomMarker } from "./marker";
+import { MarkerPopup, svgMarker } from "./marker";
 
 const maxZoom = 18;
 
+const ICON_MAPPING = {
+  marker: { x: 0, y: 0, width: 128, height: 128, anchorY: 128, mask: true },
+};
+
 export default function MainMap() {
   const { tracks, time, viewState, setViewState } = useMap();
+  const [hovered, setHovered] = useState<{
+    x: number;
+    y: number;
+    trackId: string;
+  } | null>(null);
 
   const positionsByTime = getPositionsAtTime(tracks, time);
 
@@ -46,6 +55,36 @@ export default function MainMap() {
     [tracks]
   );
 
+  const iconLayer = useMemo(() => {
+    return new IconLayer({
+      id: "icon-layer",
+      data: positionsByTime.filter((p) => p.coordinates),
+      pickable: true,
+      iconAtlas: `data:image/svg+xml;utf8,${svgMarker}`,
+      iconMapping: ICON_MAPPING,
+      getIcon: () => "marker",
+      getSize: () => 4,
+      sizeScale: 10,
+      getPosition: (d) => d.coordinates.slice(0, 2),
+      onHover: (info) => {
+        setHovered(
+          info.object
+            ? { x: info.x, y: info.y, trackId: info.object.trackId }
+            : null
+        );
+      },
+      getColor: (d) => {
+        const trackColor =
+          tracks.find((t) => t.id === d.trackId)?.color || "#0000ff";
+        return hexToRgbTuple(trackColor, 255);
+      },
+    });
+  }, [positionsByTime, tracks]);
+
+  const hoveredTrack = tracks.find((t) => t.id === hovered?.trackId);
+
+  console.log(hovered);
+
   return (
     <DeckGL
       viewState={{ ...viewState }}
@@ -58,7 +97,7 @@ export default function MainMap() {
         }
       }}
       controller={true}
-      layers={[...trackLayers]}
+      layers={[iconLayer, ...trackLayers]}
     >
       <Map
         mapLib={import("maplibre-gl")}
@@ -81,25 +120,10 @@ export default function MainMap() {
             },
           ],
         }}
-      >
-        {positionsByTime
-          .filter((p) => p.coordinates)
-          .map((p) => {
-            const trackColor =
-              tracks.find((t) => t.id === p.trackId)?.color || "#0000ff";
-            return (
-              <Marker
-                key={p.trackId}
-                longitude={p.coordinates![0]}
-                latitude={p.coordinates![1]}
-                anchor="bottom"
-                style={{ zIndex: 10 }}
-              >
-                <MyCustomMarker color={trackColor} />
-              </Marker>
-            );
-          })}
-      </Map>
+      />
+      {hoveredTrack && (
+        <MarkerPopup track={hoveredTrack} x={hovered?.x} y={hovered?.y} />
+      )}
     </DeckGL>
   );
 }
