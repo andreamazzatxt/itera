@@ -6,17 +6,12 @@ import { FloatingDrawer } from "@/components/ui/floating-drawer";
 import { Separator } from "@/components/ui/separator";
 import { DRAWER, useDrawer } from "@/contexts/drawer-context";
 import { useMap } from "@/contexts/map-context";
-import {
-  DraftingCompass,
-  FlaskConical,
-  Import,
-  Trash2Icon,
-} from "lucide-react";
+import { DraftingCompass, Trash2Icon } from "lucide-react";
 import { Fragment } from "react";
 
 export const TrackControlPanel = () => {
   const { openDrawer, open, close } = useDrawer();
-  const { tracks, setTracks, centerMap, loadExampleTracks } = useMap();
+  const { tracks, setTracks, centerMap } = useMap();
 
   const handleRemoveTrack = async (trackId: string) => {
     const confirmed = await confirmModal({
@@ -43,23 +38,6 @@ export const TrackControlPanel = () => {
       centerMap();
     }
   };
-  if (tracks.length === 0)
-    return (
-      <FloatingDrawer open className="sm:max-w-sm" glass>
-        <div className="p-4 w-full flex flex-col">
-          <div className="flex flex-col sm:flex-row justify-around gap-2 w-full">
-            <Button variant="secondary" onClick={loadExampleTracks}>
-              <FlaskConical /> Load Example Tracks
-            </Button>
-
-            <Button>
-              <Import />
-              Import GPX
-            </Button>
-          </div>
-        </div>
-      </FloatingDrawer>
-    );
 
   return (
     <>

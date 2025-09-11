@@ -2,34 +2,31 @@
 
 import { useMap } from "@/contexts/map-context";
 import { TrackConfigModal } from "@/features/track-config-modal";
-import {
-  GeoJSONCollection,
-  isValidGPXFile,
-  parseGPXToGeoJSON,
-  TrackData,
-} from "@/lib/gps-utils";
-import { MonitorUp } from "lucide-react";
-import { ReactNode, useCallback, useState } from "react";
+import { importGpxFile } from "@/lib/files";
+import { GeoJSONCollection, TrackData } from "@/lib/gps-utils";
+import { ReactNode, useCallback, useRef, useState } from "react";
 import { Card } from "./ui/card";
+import { FloatingDrawer } from "./ui/floating-drawer";
+import { Button } from "./ui/button";
+import { FlaskConical, Import } from "lucide-react";
+import { Input } from "./ui/input";
 
 interface DropZoneProps {
   children: ReactNode;
   onFilesDrop?: (files: File[]) => void;
-  acceptedFileTypes?: string[];
   showUploadedFiles?: boolean;
 }
 
-export default function DropZone({
-  children,
-  acceptedFileTypes = [".gpx"],
-}: DropZoneProps) {
-  const { setTracks, centerMap } = useMap();
+export default function DropZone({ children }: DropZoneProps) {
+  const { setTracks, centerMap, tracks, loadExampleTracks } = useMap();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [pendingTrackData, setPendingTrackData] = useState<{
     geojson: GeoJSONCollection;
     filename: string;
   } | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -41,39 +38,33 @@ export default function DropZone({
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback(
-    async (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragOver(false);
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
 
-      const file = Array.from(e.dataTransfer.files)
-        .filter((file) =>
-          acceptedFileTypes.some((ext) =>
-            file.name.toLowerCase().endsWith(ext.toLowerCase())
-          )
-        )
-        .at(0);
+    const [geojson, filename] =
+      (await importGpxFile(e.dataTransfer.files)) || [];
 
-      if (!file) return;
+    if (!geojson) return;
 
-      try {
-        if (!isValidGPXFile(file)) {
-          console.warn(`File ${file.name} is not a valid GPX`);
-          return;
-        }
-        const gpxText = await file.text();
-        const geojson = parseGPXToGeoJSON(gpxText);
-        setPendingTrackData({
-          geojson,
-          filename: file.name,
-        });
-        setIsModalOpen(true);
-      } catch (error) {
-        console.error(`Error processing file ${file.name}:`, error);
-      }
-    },
-    [acceptedFileTypes]
-  );
+    setPendingTrackData({ geojson, filename: filename || "Track" });
+    setIsModalOpen(true);
+  }, []);
+
+  const handleUploadFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const [geojson, filename] = (await importGpxFile(files)) || [];
+    if (!geojson) return;
+
+    setPendingTrackData({ geojson, filename: filename || "Track" });
+    setIsModalOpen(true);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleTrackConfigSave = (track: TrackData) => {
     setTracks((prev) => {
@@ -98,7 +89,30 @@ export default function DropZone({
       onDrop={handleDrop}
     >
       {children}
+      {tracks.length === 0 && (
+        <FloatingDrawer open className="sm:max-w-sm" glass>
+          <div className=" w-full flex flex-col">
+            <div className="flex flex-col sm:flex-row justify-around gap-2 w-full">
+              <Button variant="secondary" onClick={loadExampleTracks}>
+                <FlaskConical /> Load Example Tracks
+              </Button>
 
+              <Button onClick={() => fileInputRef.current?.click()}>
+                <Input
+                  type="file"
+                  accept=".gpx"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleUploadFile}
+                />
+                <Import />
+                Import GPX
+              </Button>
+            </div>
+          </div>
+        </FloatingDrawer>
+      )}
+      ;
       {isDragOver && (
         <div className="fixed inset-0 bg-teal-800/50 flex items-center justify-center z-[9999] pointer-events-none">
           <Card className="bg-white p-8 rounded-lg shadow-xl text-center pointer-events-auto">
@@ -109,7 +123,6 @@ export default function DropZone({
           </Card>
         </div>
       )}
-
       {isModalOpen && (
         <TrackConfigModal
           isOpen={isModalOpen}
