@@ -6,9 +6,10 @@ import { hexToRgbTuple, isMapViewState } from "@/lib/utils";
 import { PathLayer, IconLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { useMemo, useState } from "react";
-import { Map } from "react-map-gl/maplibre";
+import { Map, ScaleControl } from "react-map-gl/maplibre";
 import { useFlyOver } from "./use-fly-over";
 import { MarkerPopup, svgMarker } from "./marker";
+import { ScaleBar } from "./scale-bar";
 
 const maxZoom = 18;
 
@@ -120,7 +121,8 @@ export default function MainMap() {
             },
           ],
         }}
-      />
+      ></Map>
+      <ScaleBar latitude={viewState.latitude} zoom={viewState.zoom} />
       {hoveredTrack && (
         <MarkerPopup track={hoveredTrack} x={hovered?.x} y={hovered?.y} />
       )}
