@@ -33,10 +33,10 @@ export const Zoom = ({}) => {
   };
   return (
     <>
-      <Button size="circular" onClick={handleZoomIn}>
+      <Button size="square" onClick={handleZoomIn}>
         <ZoomIn />
       </Button>
-      <Button size="circular" onClick={handleZoomOut}>
+      <Button size="square" onClick={handleZoomOut}>
         <ZoomOut />
       </Button>
     </>

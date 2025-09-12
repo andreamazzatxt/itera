@@ -93,7 +93,7 @@ export const TimeControlPanel = () => {
   return (
     <>
       <Button
-        size="circular"
+        size="square"
         onClick={() =>
           openDrawer === DRAWER.TIME ? close() : open(DRAWER.TIME)
         }

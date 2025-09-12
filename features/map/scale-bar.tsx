@@ -27,7 +27,7 @@ export function ScaleBar({
 }
 
 function metersPerPixel(latitude: number, zoom: number): number {
-  const earthCircumference = 40075016.686; // in metri
+  const earthCircumference = 40075016.686;
   const latitudeRad = (latitude * Math.PI) / 180;
   return (earthCircumference * Math.cos(latitudeRad)) / Math.pow(2, zoom + 8);
 }

@@ -42,7 +42,7 @@ export const TrackControlPanel = () => {
   return (
     <>
       <Button
-        size="circular"
+        size="square"
         onClick={() =>
           DRAWER.TRACKS === openDrawer ? close() : open(DRAWER.TRACKS)
         }
