@@ -28,7 +28,12 @@ interface TrackConfigModalProps {
   onClose: () => void;
   onSave: (track: TrackData) => void;
   defaultName: string;
-  pendingTrackData?: { geojson: GeoJSONCollection; filename: string } | null;
+  pendingTrackData?: {
+    id?: string;
+    geojson: GeoJSONCollection;
+    filename: string;
+    color?: string;
+  } | null;
 }
 
 const DEFAULT_COLORS = [
@@ -53,16 +58,19 @@ export function TrackConfigModal({
 }: TrackConfigModalProps) {
   const [tracks] = useLocalStorage<TrackData[]>("tracks", []);
   const [trackName, setTrackName] = useState(defaultName);
-  const [selectedColor, setSelectedColor] = useState(
+
+  const defaultColor =
+    pendingTrackData?.color ??
     DEFAULT_COLORS.filter(
       (color) => !tracks.some((track) => track.color === color)
-    )[0]
-  );
+    )[0];
+
+  const [selectedColor, setSelectedColor] = useState(defaultColor);
 
   const handleSave = (config: TrackConfig) => {
     if (pendingTrackData) {
       const trackData: TrackData = {
-        id: generateTrackId(),
+        id: pendingTrackData.id ?? generateTrackId(),
         name: config.name,
         color: config.color,
         geojson: pendingTrackData.geojson,
@@ -113,10 +121,10 @@ export function TrackConfigModal({
                 <button
                   key={color}
                   type="button"
-                  className={`w-8 h-8 rounded-full border-2 transition-all ${
+                  className={`w-8 h-8 rounded-full border-2 transition-all hover:border-gray-300 cursor-pointer ${
                     selectedColor === color
-                      ? "border-gray-800 scale-110"
-                      : "border-gray-300 hover:border-gray-500"
+                      ? "border-gray-300 "
+                      : "border-gray-800  scale-110"
                   }`}
                   style={{ backgroundColor: color }}
                   onClick={() => setSelectedColor(color)}
