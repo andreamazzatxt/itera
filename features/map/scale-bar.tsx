@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { InfoModal } from "../info-modal";
 
 export function ScaleBar({
   latitude,
@@ -20,6 +21,7 @@ export function ScaleBar({
 
   return (
     <div className="absolute bottom-2 left-2 flex items-center text-xs text-white">
+      <InfoModal />
       <div className="h-[4px] bg-white" style={{ width: `${px}px` }} />
       <span className="ml-2">{label}</span>
     </div>

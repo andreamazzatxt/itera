@@ -1,23 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useLocalStorage } from "@uidotdev/usehooks";
+import { useState } from "react";
+import { Button } from "../components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogDescription,
 } from "../components/ui/dialog";
 import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
 import {
   generateTrackId,
-  type TrackData,
   type GeoJSONCollection,
+  type TrackData,
 } from "../lib/gps-utils";
-import { useMap } from "@/contexts/map-context";
-import { useLocalStorage } from "@uidotdev/usehooks";
 
 export interface TrackConfig {
   name: string;
