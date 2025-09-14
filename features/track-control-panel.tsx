@@ -36,6 +36,7 @@ export const TrackControlPanel = () => {
     if (confirmed) {
       setTracks([]);
       centerMap();
+      close();
     }
   };
 
