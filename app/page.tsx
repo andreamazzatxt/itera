@@ -21,7 +21,7 @@ export default function Home() {
     <ClientOnly>
       <DrawerProvider>
         <MapContextProvider>
-          <div className="relative w-full h-screen">
+          <div className="relative w-full h-dvh">
             <DropZone>
               <Map />
             </DropZone>

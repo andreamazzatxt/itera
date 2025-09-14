@@ -1,12 +1,11 @@
 "use client";
 
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { Cookie, Info, PawPrint } from "lucide-react";
+import { Cookie, Info } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
