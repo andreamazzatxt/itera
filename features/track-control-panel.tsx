@@ -24,6 +24,9 @@ export const TrackControlPanel = () => {
         if (newTracks.length > 0) {
           centerMap(newTracks);
         }
+        if (newTracks.length === 0) {
+          close();
+        }
         return newTracks;
       });
     }
