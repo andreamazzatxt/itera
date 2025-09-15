@@ -1,14 +1,15 @@
 "use client";
-import { createRoot } from "react-dom/client";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
+import { createRoot } from "react-dom/client";
 
 type ConfirmOptions = {
   title?: string;
@@ -26,21 +27,22 @@ function ConfirmModal({
   options: ConfirmOptions;
   onClose: (value: boolean) => void;
 }) {
+  const t = useTranslations("Common");
   return (
     <Dialog open={open} onOpenChange={() => onClose(false)}>
       <DialogContent className="sm:max-w-md" glass>
         <DialogHeader>
-          <DialogTitle>{options.title || "Are You Sure?"}</DialogTitle>
+          <DialogTitle>{options.title || t("are-you-sure")}</DialogTitle>
           <DialogDescription className="text-muted font-light">
-            {options.description || "This action cannot be undone."}
+            {options.description || t("this-action-cannot-be-undone")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex justify-end gap-2">
           <Button variant="secondary" onClick={() => onClose(false)}>
-            {options.cancelText || "Cancel"}
+            {options.cancelText || t("cancel")}
           </Button>
           <Button onClick={() => onClose(true)}>
-            {options.confirmText || "Confirm"}
+            {options.confirmText || t("confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

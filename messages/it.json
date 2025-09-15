@@ -1,0 +1,13 @@
+{
+  "Common": {
+    "this-action-cannot-be-undone": "Questa azione non può essere annullata.",
+    "are-you-sure": "Sei sicuro?",
+    "confirm": "Confermare"
+  },
+  "DropZone": {
+    "load-example-tracks": "Usa tracce di esempio",
+    "import-gpx": "Importa GPX",
+    "drop-it": "Lascia qui",
+    "your-files-will-be-uploaded-to-the-map": "I tuoi file verranno caricati sulla mappa"
+  }
+}

@@ -10,6 +10,7 @@ import { FloatingDrawer } from "./ui/floating-drawer";
 import { Button } from "./ui/button";
 import { FlaskConical, Import } from "lucide-react";
 import { Input } from "./ui/input";
+import { useTranslations } from "next-intl";
 
 interface DropZoneProps {
   children: ReactNode;
@@ -18,6 +19,7 @@ interface DropZoneProps {
 }
 
 export default function DropZone({ children }: DropZoneProps) {
+  const t = useTranslations("DropZone");
   const { setTracks, centerMap, tracks, loadExampleTracks } = useMap();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -94,7 +96,7 @@ export default function DropZone({ children }: DropZoneProps) {
           <div className=" w-full flex flex-col">
             <div className="flex flex-col sm:flex-row justify-around gap-2 w-full">
               <Button variant="secondary" onClick={loadExampleTracks}>
-                <FlaskConical /> Load Example Tracks
+                <FlaskConical /> {t("load-example-tracks")}
               </Button>
 
               <Button onClick={() => fileInputRef.current?.click()}>
@@ -106,7 +108,7 @@ export default function DropZone({ children }: DropZoneProps) {
                   onChange={handleUploadFile}
                 />
                 <Import />
-                Import GPX
+                {t("import-gpx")}
               </Button>
             </div>
           </div>
@@ -116,9 +118,11 @@ export default function DropZone({ children }: DropZoneProps) {
       {isDragOver && (
         <div className="fixed inset-0 bg-teal-800/50 flex items-center justify-center z-[9999] pointer-events-none">
           <Card className="bg-white p-8 rounded-lg shadow-xl text-center pointer-events-auto">
-            <h3 className="text-xl font-bold text-gray-800 mb-2">Drop it</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">
+              {t("drop-it")}
+            </h3>
             <p className="text-gray-600">
-              Your files will be uploaded to the map
+              {t("your-files-will-be-uploaded-to-the-map")}
             </p>
           </Card>
         </div>

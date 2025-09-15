@@ -1,0 +1,15 @@
+{
+  "Common": {
+    "cancel": "Cancel",
+    "are-you-sure": "Are You Sure?",
+    "this-action-cannot-be-undone": "This action cannot be undone.",
+    "confirm": "Confirm"
+  },
+  "confirm": "Confirm",
+  "DropZone": {
+    "load-example-tracks": "Load Example Tracks",
+    "import-gpx": "Import GPX",
+    "drop-it": "Drop it",
+    "your-files-will-be-uploaded-to-the-map": "Your files will be uploaded to the map"
+  }
+}
