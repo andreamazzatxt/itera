@@ -17,6 +17,7 @@ import {
   type GeoJSONCollection,
   type TrackData,
 } from "../lib/gps-utils";
+import { useTranslations } from "next-intl";
 
 export interface TrackConfig {
   name: string;
@@ -56,6 +57,7 @@ export function TrackConfigModal({
   defaultName = "",
   pendingTrackData,
 }: TrackConfigModalProps) {
+  const t = useTranslations("TrackConfigModal");
   const [tracks] = useLocalStorage<TrackData[]>("tracks", []);
   const [trackName, setTrackName] = useState(defaultName);
 
@@ -91,9 +93,9 @@ export function TrackConfigModal({
     <Dialog open={isOpen} onOpenChange={handleCancel}>
       <DialogContent className="sm:max-w-md z-[9999]" glass>
         <DialogHeader>
-          <DialogTitle>Track Config</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription className="text-muted font-thin">
-            Configure the track name and color before saving.
+            {t("description")}
           </DialogDescription>
         </DialogHeader>
 
@@ -103,7 +105,7 @@ export function TrackConfigModal({
               htmlFor="track-name"
               className="block text-sm font-medium mb-2"
             >
-              Track Name
+              {t("trackName")}
             </label>
             <Input
               id="track-name"
@@ -137,7 +139,7 @@ export function TrackConfigModal({
 
         <DialogFooter>
           <Button variant="ghost" onClick={handleCancel}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             onClick={() =>
@@ -145,7 +147,7 @@ export function TrackConfigModal({
             }
             disabled={!trackName.trim()}
           >
-            Save
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

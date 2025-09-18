@@ -6,7 +6,7 @@ import { hexToRgbTuple, isMapViewState } from "@/lib/utils";
 import { PathLayer, IconLayer } from "@deck.gl/layers";
 import DeckGL from "@deck.gl/react";
 import { useMemo, useState } from "react";
-import { Map, ScaleControl } from "react-map-gl/maplibre";
+import { Map } from "react-map-gl/maplibre";
 import { useFlyOver } from "./use-fly-over";
 import { MarkerPopup, svgMarker } from "./marker";
 import { ScaleBar } from "./scale-bar";

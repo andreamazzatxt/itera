@@ -11,6 +11,7 @@ import {
 } from "../components/ui/dialog";
 
 import { version } from "../package.json";
+import { useTranslations } from "next-intl";
 
 export interface TrackConfig {
   name: string;
@@ -18,6 +19,7 @@ export interface TrackConfig {
 }
 
 export function InfoModal() {
+  const t = useTranslations("InfoModal");
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -34,22 +36,23 @@ export function InfoModal() {
         </DialogHeader>
 
         <div className="text-sm font-light">
-          One day, during our usual walk in the woods,
+          {t("description.line1")}
           <br />
-          <a
-            href="https://www.instagram.com/thejolivias/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            Olivia and Joseph
-          </a>{" "}
-          got stuck in an electric fence and spent the whole night outside. I
-          was extremely worried, but luckily they are both fine. Their GPS app
-          is great, but it didn’t allow me to compare their tracks on the same
-          map. That experience motivated me to create this app, to compare their
-          paths minute by minute and better understand their behavior. <br />
-          <br />I hope it will be useful to you too!
+          {t.rich("description.line2", {
+            instaLink: (children) => (
+              <a
+                href="https://www.instagram.com/olivia_and_joseph/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {children}
+              </a>
+            ),
+          })}{" "}
+          <br />
+          <br />
+          {t("description.line3")}
           <br />
           <br />
           Made with <span className="text-red-500">♥</span> by{" "}
@@ -64,10 +67,7 @@ export function InfoModal() {
           <br />
           <br />
           <Cookie className="inline mb-1 mr-1 h-4 w-4" />
-          <span className="text-xs font-thin">
-            Your data stays safe: the app doesn’t use cookies, and the routes
-            you upload are saved only on your device.
-          </span>
+          <span className="text-xs font-thin">{t("privacy")}</span>
         </div>
       </DialogContent>
     </Dialog>

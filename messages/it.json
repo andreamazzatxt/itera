@@ -9,5 +9,25 @@
     "import-gpx": "Importa GPX",
     "drop-it": "Lascia qui",
     "your-files-will-be-uploaded-to-the-map": "I tuoi file verranno caricati sulla mappa"
+  },
+  "InfoModal": {
+    "description": {
+      "line1": "Un giorno, durante la nostra solita passeggiata nel bosco,",
+      "line2": "<instaLink> Olivia e Joseph </instaLink> sono rimasti bloccati in una recinzione elettrica e hanno trascorso tutta la notte fuori. \nEro estremamente preoccupato, ma per fortuna stanno entrambi bene. \nLa loro app GPS è fantastica, ma non mi ha permesso di confrontare le loro tracce sulla stessa mappa. \nQuell'esperienza mi ha motivato a creare questa app, a confrontare i loro percorsi minuto per minuto e comprendere meglio il loro comportamento.",
+      "line3": "Spero che sia utile anche a te!"
+    },
+    "privacy": "I tuoi dati rimangono al sicuro: l'app non utilizza i cookie e i percorsi che carichi vengono salvati solo sul tuo dispositivo."
+  },
+  "TrackConfigModal": {
+    "trackName": "Nome traccia",
+    "description": "Configurare il nome e il colore della traccia prima del salvataggio.",
+    "title": "Configura il percorso",
+    "cancel": "Annulla",
+    "save": "Salva"
+  },
+  "TrackControlPanel": {
+    "tracks": "Percorsi",
+    "description": "Gestisci i tuoi percorsi salvati. \nÈ possibile rimuovere i singoli percorsi o cancellare tutto.",
+    "clear-all": "Cancella tutto"
   }
 }

@@ -10,8 +10,10 @@ import { TrackData } from "@/lib/gps-utils";
 import { DraftingCompass, SquarePen, Trash2Icon } from "lucide-react";
 import { Fragment, useState } from "react";
 import { TrackConfigModal } from "./track-config-modal";
+import { useTranslations } from "next-intl";
 
 export const TrackControlPanel = () => {
+  const t = useTranslations("TrackControlPanel");
   const { openDrawer, open, close } = useDrawer();
   const { tracks, setTracks, centerMap } = useMap();
 
@@ -44,11 +46,8 @@ export const TrackControlPanel = () => {
       >
         <div className="flex flex-col gap-4">
           <div>
-            <h2 className="text-lg font-medium">Tracks</h2>
-            <p className="text-sm font-light">
-              Manage your saved tracks. You can remove individual tracks or
-              clear all.
-            </p>
+            <h2 className="text-lg font-medium">{t("tracks")}</h2>
+            <p className="text-sm font-light">{t("description")}</p>
           </div>
 
           <ul className="space-y-2">
@@ -58,7 +57,7 @@ export const TrackControlPanel = () => {
           </ul>
           <div className="flex gap-2 justify-end">
             <Button onClick={handleClearAllTracks} variant="destructive">
-              Clear All
+              {t("clear-all")}
             </Button>
           </div>
         </div>

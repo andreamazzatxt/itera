@@ -11,5 +11,25 @@
     "import-gpx": "Import GPX",
     "drop-it": "Drop it",
     "your-files-will-be-uploaded-to-the-map": "Your files will be uploaded to the map"
+  },
+  "InfoModal": {
+    "description": {
+      "line1": "One day, during our usual walk in the woods,",
+      "line2": "<instaLink> Olivia and Joseph </instaLink> got stuck in an electric fence and spent the whole night outside. I was extremely worried, but luckily they are both fine. Their GPS app is great, but it didn’t allow me to compare their tracks on the same map. That experience motivated me to create this app, to compare their paths minute by minute and better understand their behavior.",
+      "line3": "I hope it will be useful to you too!"
+    },
+    "privacy": "Your data stays safe: the app doesn’t use cookies, and the routes you upload are saved only on your device."
+  },
+  "TrackConfigModal": {
+    "title": "Track Config",
+    "description": "Configure the track name and color before saving.",
+    "trackName": "Track Name",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "TrackControlPanel": {
+    "tracks": "Tracks",
+    "description": "Manage your saved tracks. You can remove individual tracks or clear all.",
+    "clear-all": "Clear All"
   }
 }
