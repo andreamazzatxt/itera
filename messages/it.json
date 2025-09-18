@@ -2,7 +2,8 @@
   "Common": {
     "this-action-cannot-be-undone": "Questa azione non può essere annullata.",
     "are-you-sure": "Sei sicuro?",
-    "confirm": "Confermare"
+    "confirm": "Confermare",
+    "cancel": "Annulla"
   },
   "DropZone": {
     "load-example-tracks": "Usa tracce di esempio",
