@@ -84,8 +84,6 @@ export default function MainMap() {
 
   const hoveredTrack = tracks.find((t) => t.id === hovered?.trackId);
 
-  console.log(hovered);
-
   return (
     <DeckGL
       viewState={{ ...viewState }}

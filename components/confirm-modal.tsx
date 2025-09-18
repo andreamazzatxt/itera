@@ -8,8 +8,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useTranslations } from "next-intl";
+import { NextIntlClientProvider, useTranslations } from "next-intl";
 import { createRoot } from "react-dom/client";
+import en from "../messages/en.json";
+import it from "../messages/it.json";
 
 type ConfirmOptions = {
   title?: string;
@@ -63,8 +65,15 @@ export function confirmModal(options: ConfirmOptions = {}): Promise<boolean> {
       resolve(value);
     };
 
+    const locale = window.navigator.language.split("-")[0];
+
     root.render(
-      <ConfirmModal open={true} options={options} onClose={handleClose} />
+      <NextIntlClientProvider
+        locale={locale}
+        messages={locale === "it" ? it : en}
+      >
+        <ConfirmModal open={true} options={options} onClose={handleClose} />
+      </NextIntlClientProvider>
     );
   });
 }

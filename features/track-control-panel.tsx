@@ -97,7 +97,6 @@ const TrackRow = ({ track }: { track: TrackData }) => {
     setIsEditing(false);
   };
 
-  console.log({ track });
   return (
     <Fragment key={track.id}>
       <li className="flex items-center gap-2">
