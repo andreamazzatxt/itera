@@ -52,7 +52,7 @@ export const TrackControlPanel = () => {
 
           <ul className="space-y-2">
             {tracks.map((track) => (
-              <TrackRow key={track.id} track={track} />
+              <TrackRow key={track.id} track={track} onClose={close} />
             ))}
           </ul>
           <div className="flex gap-2 justify-end">
@@ -66,7 +66,13 @@ export const TrackControlPanel = () => {
   );
 };
 
-const TrackRow = ({ track }: { track: TrackData }) => {
+const TrackRow = ({
+  track,
+  onClose,
+}: {
+  track: TrackData;
+  onClose: () => void;
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const { setTracks, centerMap } = useMap();
 
@@ -82,7 +88,7 @@ const TrackRow = ({ track }: { track: TrackData }) => {
           centerMap(newTracks);
         }
         if (newTracks.length === 0) {
-          close();
+          onClose();
         }
         return newTracks;
       });
