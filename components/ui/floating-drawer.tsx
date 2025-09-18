@@ -27,7 +27,7 @@ export function FloatingDrawer({
       {open && (
         <motion.div
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-end justify-center p-6 pb-12 sm:p-12 pointer-events-none"
+          className="fixed inset-0 z-50 flex items-end justify-center p-2 pb-12 sm:p-12 pointer-events-none"
         >
           {/* Card drawer */}
           <motion.div
