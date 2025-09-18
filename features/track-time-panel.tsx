@@ -5,7 +5,7 @@ import { FloatingDrawer } from "@/components/ui/floating-drawer";
 import { TimeScrollPicker } from "@/components/ui/time-scroll-picker";
 import { DRAWER, useDrawer } from "@/contexts/drawer-context";
 import { Speed, useMap } from "@/contexts/map-context";
-import { formatTimestamp } from "@/lib/utils";
+import { cn, formatTimestamp } from "@/lib/utils";
 import { LinearInterpolator, MapViewState } from "@deck.gl/core";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import {
@@ -28,8 +28,10 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { HoldButton } from "@/components/ui/hold-button";
+import { useState } from "react";
 
 export const TimeControlPanel = () => {
+  const [isMinimized, setIsMinimized] = useState(false);
   const { open, close, openDrawer } = useDrawer();
   const {
     minTime,
@@ -44,6 +46,7 @@ export const TimeControlPanel = () => {
     speed,
     setSpeed,
   } = useMap();
+
   const [tracks] = useLocalStorage<TrackData[]>("tracks", []);
 
   function handleValueChange(newValue: number[]) {
@@ -100,10 +103,27 @@ export const TimeControlPanel = () => {
       >
         <Clock />
       </Button>
-      <FloatingDrawer open={openDrawer === DRAWER.TIME} onClose={close} glass>
+      <FloatingDrawer
+        open={openDrawer === DRAWER.TIME}
+        onClose={close}
+        onChangeDimensions={() => setIsMinimized((prev) => !prev)}
+        isMinimized={isMinimized}
+        className={isMinimized ? "max-w-xl max-h-72" : "max-h-3xl"}
+        glass
+      >
         <div className="w-full flex flex-col gap-5 select-none">
-          <div className="flex flex-col items-center justify-center  space-x-2 px-4 gap-6 sm:gap-2">
-            <div className="mt-2 font-mono text-xl sm:text-lg mr-8 self-start select-text">
+          <div
+            className={cn(
+              "flex flex-col items-center justify-center  space-x-2 px-4 sm:gap-2",
+              isMinimized ? " gap-2" : "gap-6"
+            )}
+          >
+            <div
+              className={cn(
+                "mt-2 font-mono text-xl sm:text-lg mr-8 select-text",
+                isMinimized ? "" : "sm:self-start"
+              )}
+            >
               {formatTimestamp(time ? +time : 0)}
             </div>
 
@@ -131,55 +151,61 @@ export const TimeControlPanel = () => {
               </HoldButton>
             </div>
           </div>
-          <div className="sm:hidden mx-[-36px]">
-            <TimeScrollPicker
-              startDate={new Date(minTime!)}
-              endDate={new Date(maxTime!)}
-              stepMinutes={5}
-              selectedDate={time ? new Date(+time) : undefined}
-              onChange={(date) => handleValueChange([date.getTime()])}
-              isPlaying={isPlaying}
-            />
-          </div>
-          <div className="hidden sm:block">
-            <Slider
-              value={[time ? +time : 0]}
-              min={minTime}
-              max={maxTime}
-              step={1000}
-              onValueChange={handleValueChange}
-              aria-label="Time slider"
-            />
-          </div>
-          <ToggleGroup
-            value={`${speed}`}
-            type="single"
-            className="self-end"
-            onValueChange={(value) => {
-              if (value) {
-                setSpeed(parseInt(value, 10));
-              }
-            }}
-          >
-            <ToggleGroupItem
-              value={`${Speed.Slow}`}
-              aria-label="Set Slow Speed"
+          {!isMinimized && (
+            <>
+              <div className="sm:hidden mx-[-36px]">
+                <TimeScrollPicker
+                  startDate={new Date(minTime!)}
+                  endDate={new Date(maxTime!)}
+                  stepMinutes={5}
+                  selectedDate={time ? new Date(+time) : undefined}
+                  onChange={(date) => handleValueChange([date.getTime()])}
+                  isPlaying={isPlaying}
+                />
+              </div>
+              <div className="hidden sm:block">
+                <Slider
+                  value={[time ? +time : 0]}
+                  min={minTime}
+                  max={maxTime}
+                  step={1000}
+                  onValueChange={handleValueChange}
+                  aria-label="Time slider"
+                />
+              </div>
+            </>
+          )}
+          {!isMinimized && (
+            <ToggleGroup
+              value={`${speed}`}
+              type="single"
+              className="self-end"
+              onValueChange={(value) => {
+                if (value) {
+                  setSpeed(parseInt(value, 10));
+                }
+              }}
             >
-              <Snail className="h-4 w-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value={`${Speed.Medium}`}
-              aria-label="Set Medium Speed"
-            >
-              <Turtle className="h-4 w-4" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value={`${Speed.Fast}`}
-              aria-label="Set Fast Speed"
-            >
-              <Rabbit className="h-4 w-4" />
-            </ToggleGroupItem>
-          </ToggleGroup>
+              <ToggleGroupItem
+                value={`${Speed.Slow}`}
+                aria-label="Set Slow Speed"
+              >
+                <Snail className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value={`${Speed.Medium}`}
+                aria-label="Set Medium Speed"
+              >
+                <Turtle className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                value={`${Speed.Fast}`}
+                aria-label="Set Fast Speed"
+              >
+                <Rabbit className="h-4 w-4" />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          )}
         </div>
       </FloatingDrawer>
     </>

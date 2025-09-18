@@ -1,11 +1,13 @@
-import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
+import { Maximize, Minimize, X } from "lucide-react";
 import { ReactNode } from "react";
-import { X } from "lucide-react";
 
 type FloatingDrawerProps = {
   open: boolean;
   onClose?: () => void;
+  onChangeDimensions?: () => void;
+  isMinimized?: boolean;
   children: ReactNode;
   className?: string;
   glass?: boolean;
@@ -14,6 +16,8 @@ type FloatingDrawerProps = {
 export function FloatingDrawer({
   open,
   onClose,
+  onChangeDimensions,
+  isMinimized,
   children,
   className,
   glass = false,
@@ -29,9 +33,9 @@ export function FloatingDrawer({
           <motion.div
             layout
             initial={{ y: "100%" }}
-            animate={{ y: 0 }}
+            animate={{ y: 1 }}
             exit={{ y: "100%" }}
-            transition={{ type: "tween", duration: 0.2 }}
+            transition={{ type: "spring", duration: 0.3, bounce: 0.4 }}
             className={cn(
               glass
                 ? "bg-gray-500 bg-clip-padding backdrop-filter  backdrop-blur-2xl bg-opacity-50 backdrop-saturate-100 backdrop-contrast-100 text-white font-semibold"
@@ -40,11 +44,18 @@ export function FloatingDrawer({
               className
             )}
           >
-            {onClose && (
-              <button onClick={onClose} className="absolute top-2 right-2">
-                <X />
-              </button>
-            )}
+            <div className="absolute top-2 right-2 flex gap-1">
+              {onChangeDimensions && (
+                <button onClick={onChangeDimensions}>
+                  {isMinimized ? <Maximize /> : <Minimize />}
+                </button>
+              )}
+              {onClose && (
+                <button onClick={onClose}>
+                  <X />
+                </button>
+              )}
+            </div>
 
             <div className="space-y-2">{children}</div>
           </motion.div>
