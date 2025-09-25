@@ -31,7 +31,7 @@ export function InfoModal() {
       <DialogContent className="sm:max-w-md z-[9999]" glass>
         <DialogHeader>
           <DialogTitle>
-            Itera <span className="text-xs">v{version}</span>
+            Map My Pet <span className="text-xs">v{version}</span>
           </DialogTitle>
         </DialogHeader>
 
