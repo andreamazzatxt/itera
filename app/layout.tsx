@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Itera",
-  description: "Show your track data",
+  title: "Map My Pet",
+  description: "Visualize your pet's GPS data on an interactive map",
 };
 
 export default function RootLayout({
